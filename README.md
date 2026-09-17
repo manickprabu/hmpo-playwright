@@ -1,0 +1,82 @@
+# Passport browser automation
+
+Sequential, session-isolated Playwright automation for processing passport numbers from a local text file. It records JPEG screenshots, optional tab text, errors, and a JSON summary locally. It does not send data to third parties.
+
+## Prerequisites
+
+- Node.js 20 or later
+- Access to the target site and authorization to automate it
+
+## Install
+
+```bash
+npm install
+npx playwright install chromium
+cp .env.example .env
+```
+
+Set `TARGET_URL` in `.env`. Never commit `.env`; it is ignored by Git.
+
+## Configure
+
+1. Put one passport number per line in `input/passports.txt`. Empty lines, lines beginning with `#`, surrounding whitespace, and duplicates are ignored.
+2. Update the TODO selectors in `src/selectors.ts`.
+3. Update the page/tab configuration in `src/pages.ts`. Each section has one navigation selector and any number of tabs, allowing navigation logic to remain reusable.
+4. For the tab that needs text output, set `extractText: true` and use a `contentSelector` scoped to only that tab's actual content.
+
+The starter page definitions are illustrative only: they will not work until their TODO selectors match the target site.
+
+## Run
+
+```bash
+npm run dev       # run TypeScript directly
+npm run build
+npm start         # run compiled JavaScript
+```
+
+For visible debugging, set these in `.env`:
+
+```dotenv
+HEADLESS=false
+SLOW_MO=100
+```
+
+Use `HEADLESS=true` for normal unattended execution. `NAVIGATION_TIMEOUT`, `SCREENSHOT_QUALITY` (0–100), `INPUT_FILE`, and `OUTPUT_DIR` are also configured in `.env`.
+
+## Output
+
+Each passport has an isolated browser context and an output directory, for example:
+
+```text
+output/
+  P1234567/
+    01-overview.jpg
+    02-personal-details.jpg
+    03-application-details.jpg
+    04-history.jpg
+    special-tab.jpg
+    special-tab.txt
+  summary.json
+```
+
+Folder and filenames are sanitized before writing. On a per-passport failure, the run continues and creates `error.txt` and `error-screenshot.jpg` in that passport's folder. Console output masks passport numbers; `summary.json` keeps the original number so results can be mapped to their required output folders.
+
+## Screenshot behavior
+
+Before every capture, the project progressively scrolls the document and scrollable descendants of the configured tab content to trigger lazy loading, then uses Playwright's `fullPage` JPEG capture. If that capture fails, it saves ordered viewport parts such as `04-history-01.jpg`, rather than silently dropping content.
+
+For an app with fixed-height/internal scrolling panels, ensure `contentSelector` targets the panel. If the site virtualizes or infinitely loads rows, define a site-specific stopping condition in `src/utils/scrollUtils.ts`; no generic tool can know when an unbounded feed is complete.
+
+## Troubleshooting
+
+- **Selector timeout:** inspect the target DOM in visible mode, then replace the matching TODO selector in `src/selectors.ts` or `src/pages.ts`.
+- **Login indicates failure:** change `errorMessage` and `loginSuccessIndicator` in `src/selectors.ts` to reliable, mutually exclusive UI elements.
+- **SPA transitions:** configure a `readySelector` for every section. The automation waits on DOM state rather than assuming a full navigation.
+- **Missing content or text:** point `contentSelector` at the active tab's dedicated content region, excluding global navigation, header, and footer.
+- **Browser executable missing:** rerun `npx playwright install chromium`.
+
+## Files to update when the target HTML/screenshots arrive
+
+- `src/selectors.ts`: passport input, submit, success, logout, spinner, and error selectors.
+- `src/pages.ts`: page navigation, tab controls, ready/content regions, names, order, and required text-extraction tab.
+- `src/utils/scrollUtils.ts`: only if the site has unusual virtualized/infinite content or scroll containers hidden behind shadow DOM.
