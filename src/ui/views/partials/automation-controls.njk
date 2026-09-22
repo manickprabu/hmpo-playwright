@@ -1,0 +1,13 @@
+<section class="dashboard-panel govuk-!-margin-bottom-7" aria-labelledby="automation-controls-title">
+  <h2 class="govuk-heading-l" id="automation-controls-title">Automation controls</h2>
+  <form id="target-url-form" novalidate>
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="target-url">Target website URL</label>
+      <div id="target-url-hint" class="govuk-hint">This is saved locally in your .env file.</div>
+      <input class="govuk-input" id="target-url" name="target-url" type="url" spellcheck="false" autocomplete="url" aria-describedby="target-url-hint" />
+    </div>
+    <button class="govuk-button govuk-button--secondary" type="submit">Save target URL</button>
+    <button class="govuk-button govuk-!-margin-left-2" id="start-automation" type="button">Start automation</button>
+  </form>
+  <p class="govuk-body govuk-!-margin-bottom-0" id="control-message" role="status" aria-live="polite"></p>
+</section>

@@ -24,12 +24,9 @@ export async function processTab(
   if (content) await content.waitFor({ state: 'visible' });
   await waitForSettled(page, selectors.loadingSpinner);
   await captureScreenshot(page, path.join(folder, tab.screenshotFilename), config, content);
-  if (tab.extractText) {
-    if (!content)
-      throw new Error(`Tab ${tab.name} requires a contentSelector for text extraction.`);
-    await extractTabText(
-      content,
-      path.join(folder, `${path.parse(tab.screenshotFilename).name}.txt`),
-    );
-  }
+  if (!content) throw new Error(`Tab ${tab.name} requires a contentSelector for text extraction.`);
+  await extractTabText(
+    content,
+    path.join(folder, tab.textFilename ?? `${path.parse(tab.screenshotFilename).name}.txt`),
+  );
 }

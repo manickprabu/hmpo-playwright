@@ -1,0 +1,29 @@
+<section class="dashboard-summary govuk-!-margin-bottom-7" aria-label="Batch progress">
+  <p class="dashboard-summary__state" id="state" aria-live="polite">Waiting for a run</p>
+  <p class="dashboard-summary__progress" id="progress-copy">No activity yet</p>
+  <div class="dashboard-progress" aria-hidden="true"><div class="dashboard-progress__bar" id="progress-fill"></div></div>
+  <p class="dashboard-summary__progress govuk-!-margin-top-4" id="record-progress-copy">Current record progress: waiting to start.</p>
+  <div class="dashboard-progress dashboard-progress--record" aria-hidden="true"><div class="dashboard-progress__bar" id="record-progress-fill"></div></div>
+  <p class="govuk-body govuk-!-margin-top-3 govuk-!-margin-bottom-0" id="current-step">Start the automation to see progress here.</p>
+</section>
+<button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" id="download-report" type="button" disabled>Download final report (.zip)</button>
+<p class="govuk-hint govuk-!-margin-top-0" id="download-report-hint">The report will be available after processing completes.</p>
+<section class="govuk-grid-row govuk-!-margin-bottom-7" aria-label="Run summary">
+  <div class="govuk-grid-column-one-quarter"><div class="dashboard-stat"><p class="dashboard-stat__label">Records</p><strong class="dashboard-stat__value" id="total">0</strong></div></div>
+  <div class="govuk-grid-column-one-quarter"><div class="dashboard-stat"><p class="dashboard-stat__label">Completed</p><strong class="dashboard-stat__value" id="completed">0</strong></div></div>
+  <div class="govuk-grid-column-one-quarter"><div class="dashboard-stat dashboard-stat--success"><p class="dashboard-stat__label">Successful</p><strong class="dashboard-stat__value" id="successful">0</strong></div></div>
+  <div class="govuk-grid-column-one-quarter"><div class="dashboard-stat dashboard-stat--error"><p class="dashboard-stat__label">Needs review</p><strong class="dashboard-stat__value" id="failed">0</strong></div></div>
+</section>
+<section class="dashboard-panel govuk-!-margin-bottom-6">
+  <h2 class="govuk-heading-l">Processed records</h2>
+  <p class="govuk-body" id="result-count">0 records</p>
+  <table class="govuk-table">
+    <thead class="govuk-table__head"><tr class="govuk-table__row"><th class="govuk-table__header" scope="col">Record</th><th class="govuk-table__header" scope="col">Status</th><th class="govuk-table__header" scope="col">Completed</th></tr></thead>
+    <tbody class="govuk-table__body" id="results"><tr class="govuk-table__row"><td class="govuk-table__cell" colspan="3">Results will appear as records finish.</td></tr></tbody>
+  </table>
+</section>
+<section class="dashboard-panel">
+  <h2 class="govuk-heading-l">Current activity</h2>
+  <p class="dashboard-current-record">Current record: <strong id="current-passport">—</strong></p>
+  <ol class="dashboard-events" id="events"><li class="dashboard-events__item">No activity has been recorded.</li></ol>
+</section>

@@ -60,7 +60,6 @@ export const sections: SectionDefinition[] = [
         selector: '[data-testid="tab-special"]', // TODO: replace
         contentSelector: '[data-testid="special-tab-content"]', // TODO: scope text to actual content
         screenshotFilename: 'special-tab.jpg',
-        extractText: true,
       },
     ],
   },

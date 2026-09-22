@@ -1,0 +1,14 @@
+<section class="dashboard-panel govuk-!-margin-bottom-7" aria-labelledby="passport-management-title">
+  <h2 class="govuk-heading-l" id="passport-management-title">Passport numbers in batch</h2>
+  <p class="govuk-hint">These numbers are visible only in this local dashboard.</p>
+  <ul class="govuk-list" id="passport-list"><li>Loading passport numbers…</li></ul>
+  <p class="govuk-body" id="passport-count"></p>
+  <form id="passport-form" novalidate>
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="passport-number">Add passport number</label>
+      <input class="govuk-input govuk-input--width-20" id="passport-number" name="passport-number" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false" />
+    </div>
+    <button class="govuk-button govuk-button--secondary" type="submit">Add to batch</button>
+  </form>
+  <p class="govuk-body govuk-!-margin-bottom-0" id="passport-message" role="status" aria-live="polite"></p>
+</section>

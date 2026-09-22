@@ -1,0 +1,46 @@
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/skip-link/macro.njk" import govukSkipLink %}
+{% from "hmpo-inset-text/macro.njk" import hmpoInsetText %}
+{% from "hmpo-footer/macro.njk" import hmpoFooter %}
+<!doctype html>
+<html lang="en" class="govuk-template">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Passport automation – HM Passport Office</title>
+    <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/assets/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="govuk-template__body">
+    <script>document.body.className += ' js-enabled';</script>
+    {{ govukSkipLink({ href: '#main-content', text: 'Skip to main content' }) }}
+    {{ govukHeader({ homepageUrl: 'https://www.gov.uk/', serviceName: 'Passport automation', serviceUrl: '/', useTudorCrown: true }) }}
+    <main class="govuk-main-wrapper" id="main-content">
+      <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Passport automation activity</h1>
+            {{ hmpoInsetText({ text: 'This local dashboard refreshes automatically while a batch runs. Passport numbers are masked.' }) }}
+          </div>
+        </div>
+
+        <div class="dashboard-layout">
+          <nav class="dashboard-navigation" aria-label="Dashboard sections" role="tablist">
+            <button class="dashboard-navigation__item is-active" type="button" role="tab" aria-selected="true" aria-controls="automation-panel" data-panel-target="automation-panel">Automation</button>
+            <button class="dashboard-navigation__item" type="button" role="tab" aria-selected="false" aria-controls="passport-panel" data-panel-target="passport-panel">Passport numbers</button>
+            <button class="dashboard-navigation__item" type="button" role="tab" aria-selected="false" aria-controls="activity-panel" data-panel-target="activity-panel">Activity</button>
+          </nav>
+          <div class="dashboard-content">
+            <section id="automation-panel" role="tabpanel">{% include "partials/automation-controls.njk" %}</section>
+            <section id="passport-panel" role="tabpanel" hidden>{% include "partials/passport-management.njk" %}</section>
+            <section id="activity-panel" role="tabpanel" hidden>{% include "partials/run-summary.njk" %}</section>
+          </div>
+        </div>
+        <p class="govuk-hint">Screenshots and extracted text remain in the local output folder.</p>
+      </div>
+    </main>
+    {{ hmpoFooter({ organisationLogo: true }) }}
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

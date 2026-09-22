@@ -3,6 +3,7 @@ import type { Page } from 'playwright';
 import { loadConfig } from './config.js';
 import { sections } from './pages.js';
 import { createIsolatedPage, launchBrowser } from './services/browser.js';
+import { ActivityTracker } from './services/activityTracker.js';
 import { loginWithPassport, logout } from './services/login.js';
 import { navigateToSection, processTab } from './services/navigator.js';
 import { readPassportNumbers } from './services/passportReader.js';
@@ -39,13 +40,19 @@ async function main(): Promise<void> {
   const config = loadConfig();
   await ensureDirectory(config.outputDir);
   const passports = await readPassportNumbers(config.inputFile);
+  const activity = new ActivityTracker(config.outputDir);
   if (!passports.length) {
     logger.warn('No passport numbers were found in the input file. Nothing to process.');
+    await activity.start(0);
+    await activity.finish();
     return;
   }
 
+  await activity.start(passports.length);
   const browser = await launchBrowser(config);
   const results: PassportResult[] = [];
+  const recordSteps =
+    4 + sections.length + sections.reduce((total, section) => total + section.tabs.length * 2, 0);
   try {
     for (const [index, passport] of passports.entries()) {
       const startedAt = new Date().toISOString();
@@ -53,21 +60,29 @@ async function main(): Promise<void> {
       const folder = passportOutputDirectory(config.outputDir, passport);
       await ensureDirectory(folder);
       logger.info(`[${index + 1}/${passports.length}] Processing ${masked}`);
+      activity.beginRecord(passport, recordSteps);
+      await activity.step(passport, `Processing record ${index + 1} of ${passports.length}.`);
       let result: PassportResult;
       let session: Awaited<ReturnType<typeof createIsolatedPage>> | undefined;
       try {
         session = await createIsolatedPage(browser, config);
         logger.info('Opening website…');
+        await activity.step(passport, 'Opening website.');
         await session.page.goto(config.targetUrl, { waitUntil: 'domcontentloaded' });
         logger.info('Submitting passport…');
+        await activity.step(passport, 'Submitting passport.');
         await loginWithPassport(session.page, passport);
         logger.info('Login successful.');
+        await activity.step(passport, 'Login successful.');
         for (const section of sections) {
           logger.info(`Capturing ${section.name}…`);
+          await activity.step(passport, `Capturing ${section.name}.`);
           await navigateToSection(session.page, section);
           for (const tab of section.tabs) {
+            await activity.step(passport, `Processing ${tab.name}.`);
             await processTab(session.page, tab, folder, config);
-            if (tab.extractText) logger.info(`Extracting ${tab.name}…`);
+            logger.info(`Extracted text from ${tab.name}.`);
+            await activity.step(passport, `Extracted text from ${tab.name}.`);
           }
         }
         result = {
@@ -101,6 +116,7 @@ async function main(): Promise<void> {
         }
       }
       results.push(result);
+      await activity.record(result);
     }
   } finally {
     await browser.close();
@@ -121,6 +137,7 @@ async function main(): Promise<void> {
       2,
     )}\n`,
   );
+  await activity.finish();
   logger.info(
     `\nProcessing completed.\n\nTotal: ${results.length}\nSuccessful: ${successful}\nFailed: ${results.length - successful}`,
   );

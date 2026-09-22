@@ -13,7 +13,7 @@ export interface TabDefinition {
   selector: string;
   screenshotFilename: string;
   contentSelector?: string;
-  extractText?: boolean;
+  textFilename?: string;
 }
 
 export interface SectionDefinition {
