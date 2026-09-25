@@ -3,10 +3,10 @@
  * inspecting the target site's HTML; do not distribute selectors through services.
  */
 export const selectors = {
-  passportInput: '[data-testid="passport-number"]', // TODO: replace
-  loginButton: '[data-testid="submit-passport"]', // TODO: replace
-  loginSuccessIndicator: '[data-testid="application-shell"]', // TODO: replace
-  logoutButton: '[data-testid="logout"]', // TODO: replace
-  loadingSpinner: '[data-testid="loading-spinner"]', // TODO: replace or set undefined
-  errorMessage: '[role="alert"]', // TODO: replace with login error container
+  passportInput: '#passportNumber',
+  loginButton: '#search-submit-button',
+  loginSuccessIndicator: 'body',
+  logoutButton: 'button:has-text("Logout")',
+  loadingSpinner: 'text=Loading',
+  errorMessage: '[role="alert"], .error-message, .alert-danger',
 };

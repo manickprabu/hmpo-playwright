@@ -11,7 +11,18 @@ export async function waitForSettled(page: Page, spinnerSelector?: string): Prom
 }
 
 export async function clickWhenReady(locator: Locator): Promise<void> {
-  await locator.waitFor({ state: 'visible' });
+  await locator.waitFor({ state: 'visible', timeout: 15_000 });
   await locator.scrollIntoViewIfNeeded();
-  await locator.click();
+  try {
+    await locator.click({ force: true });
+  } catch {
+    await locator.evaluate((element: HTMLElement) => {
+      const button = element as HTMLButtonElement;
+      if (button.form && typeof button.form.requestSubmit === 'function') {
+        button.form.requestSubmit();
+        return;
+      }
+      button.click();
+    });
+  }
 }

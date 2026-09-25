@@ -28,12 +28,13 @@
         <div class="dashboard-layout">
           <nav class="dashboard-navigation" aria-label="Dashboard sections" role="tablist">
             <button class="dashboard-navigation__item is-active" type="button" role="tab" aria-selected="true" aria-controls="automation-panel" data-panel-target="automation-panel">Automation</button>
-            <button class="dashboard-navigation__item" type="button" role="tab" aria-selected="false" aria-controls="passport-panel" data-panel-target="passport-panel">Passport numbers</button>
             <button class="dashboard-navigation__item" type="button" role="tab" aria-selected="false" aria-controls="activity-panel" data-panel-target="activity-panel">Activity</button>
           </nav>
           <div class="dashboard-content">
-            <section id="automation-panel" role="tabpanel">{% include "partials/automation-controls.njk" %}</section>
-            <section id="passport-panel" role="tabpanel" hidden>{% include "partials/passport-management.njk" %}</section>
+            <section id="automation-panel" role="tabpanel">
+              {% include "partials/automation-controls.njk" %}
+              {% include "partials/passport-management.njk" %}
+            </section>
             <section id="activity-panel" role="tabpanel" hidden>{% include "partials/run-summary.njk" %}</section>
           </div>
         </div>

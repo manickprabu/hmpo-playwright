@@ -11,9 +11,11 @@ export interface AppConfig {
 export interface TabDefinition {
   name: string;
   selector: string;
-  screenshotFilename: string;
+  screenshotFilename?: string;
+  ignoreScreenshot?: boolean;
   contentSelector?: string;
   textFilename?: string;
+  extractText?: boolean;
 }
 
 export interface SectionDefinition {

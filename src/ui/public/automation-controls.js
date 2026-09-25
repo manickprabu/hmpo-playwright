@@ -38,15 +38,12 @@ export function initialiseAutomationControls() {
     }
   });
 
-  byId('start-automation').addEventListener('click', async (event) => {
-    const button = event.currentTarget;
-    button.disabled = true;
+  byId('start-automation').addEventListener('click', async () => {
     try {
       const result = await api('/api/automation/start', requestOptions('POST', {}));
       setMessage(result.message);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Could not start automation.', true);
-      button.disabled = false;
     }
   });
 }

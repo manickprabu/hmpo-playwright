@@ -45,7 +45,6 @@ export function renderDashboard(status) {
       : 'Current record progress: waiting to start.',
   );
   byId('record-progress-fill').style.width = `${recordPercent}%`;
-  byId('start-automation').disabled = status.state === 'running';
   byId('download-report').disabled = status.state !== 'completed';
   setText(
     'download-report-hint',
