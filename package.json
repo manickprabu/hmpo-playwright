@@ -14,6 +14,7 @@
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "mocha --import=tsx \"test/**/*.test.js\"",
     "test:coverage": "c8 mocha --import=tsx \"test/**/*.test.js\"",
+    "docs:guide": "node scripts/generate-project-guide.mjs",
     "format": "prettier --write \"src/**/*.ts\" \"src/ui/public/*.{html,css,js}\" \"*.{json,md,yml,yaml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"src/ui/public/*.{html,css,js}\" \"*.{json,md,yml,yaml}\""
   },
@@ -34,6 +35,7 @@
     "@types/node": "^22.15.30",
     "@types/nunjucks": "^3.2.6",
     "c8": "^12.0.0",
+    "docx": "^9.8.1",
     "jsdom": "^30.1.2",
     "mocha": "^12.0.3",
     "prettier": "^3.9.6",
