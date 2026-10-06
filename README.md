@@ -34,6 +34,17 @@ npm run build
 npm start         # run compiled JavaScript
 ```
 
+## Tests
+
+Run the Mocha unit tests and the coverage-enforced suite with:
+
+```bash
+npm test
+npm run test:coverage
+```
+
+Coverage enforces at least 80% for statements, branches, functions, and lines across the core modules and public dashboard feature scripts listed in `.c8rc.json`. Browser workflows, the dashboard server, and the public app bootstrap require browser/site or HTTP integration tests and are outside this unit-test coverage scope.
+
 ## Local activity dashboard
 
 Start the dashboard in one terminal, then run the automation in another. The dashboard command compiles the HMPO/GOV.UK assets before starting:

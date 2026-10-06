@@ -12,6 +12,8 @@
     "ui:start": "node dist/ui/server.js",
     "copy:ui": "mkdir -p dist/ui/public && cp src/ui/public/*.js dist/ui/public/ && cp -R node_modules/govuk-frontend/dist/govuk/assets dist/ui/public/assets && sass --quiet-deps --silence-deprecation=import --load-path=node_modules src/ui/styles.scss dist/ui/public/styles.css",
     "check": "tsc --noEmit -p tsconfig.json",
+    "test": "mocha --import=tsx \"test/**/*.test.js\"",
+    "test:coverage": "c8 mocha --import=tsx \"test/**/*.test.js\"",
     "format": "prettier --write \"src/**/*.ts\" \"src/ui/public/*.{html,css,js}\" \"*.{json,md,yml,yaml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"src/ui/public/*.{html,css,js}\" \"*.{json,md,yml,yaml}\""
   },
@@ -28,10 +30,15 @@
   },
   "devDependencies": {
     "@types/archiver": "^8.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.30",
     "@types/nunjucks": "^3.2.6",
+    "c8": "^12.0.0",
+    "jsdom": "^30.1.2",
+    "mocha": "^12.0.3",
     "prettier": "^3.9.6",
     "sass": "^1.104.1",
+    "sinon": "^22.1.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }

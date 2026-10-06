@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import path from 'node:path';
 import type { AppConfig } from './types/index.js';
 
