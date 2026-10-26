@@ -4,6 +4,51 @@ $govuk-suppressed-warnings: ('govuk-typography-responsive');
 @import 'govuk-frontend/dist/govuk/index';
 @import 'hmpo-components/all';
 
+.protected-message-editor {
+  position: relative;
+  min-height: 20rem;
+  overflow: hidden;
+  background: govuk-colour('white');
+}
+
+.protected-message-editor__overlay,
+.protected-message-editor__textarea {
+  @include govuk-font(19);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 20rem;
+  margin: 0;
+  padding: govuk-spacing(1);
+  border: 2px solid $govuk-input-border-colour;
+  line-height: 1.31579;
+  overflow: auto;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.protected-message-editor__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: $govuk-text-colour;
+}
+
+.protected-message-editor__textarea {
+  position: relative;
+  display: block;
+  resize: vertical;
+  color: transparent;
+  caret-color: $govuk-text-colour;
+  background: transparent;
+
+  &::selection { color: transparent; background: rgba(255, 221, 0, .75); }
+}
+
+.protected-message-editor__textarea:focus { z-index: 1; }
+.protected-message-editor__protected { color: #d4351c; background: #fcebea; }
+.protected-message-editor--invalid { outline: 4px solid $govuk-error-colour; }
+
 .dashboard-summary {
   border-left: 10px solid govuk-colour('blue');
   background: govuk-colour('light-grey');

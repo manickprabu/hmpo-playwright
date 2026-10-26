@@ -4,6 +4,7 @@ import { renderDashboard } from './dashboard.js';
 import { initialisePassportManagement, loadPassports } from './passport-management.js';
 import { initialiseNavigation } from './navigation.js';
 import { initialiseReportDownload } from './report-download.js';
+import { initialiseProtectedMessageEditors } from './protected-message-editor.js';
 
 async function refreshDashboard() {
   try {
@@ -17,6 +18,7 @@ initialiseAutomationControls();
 initialisePassportManagement();
 initialiseNavigation();
 initialiseReportDownload();
+initialiseProtectedMessageEditors();
 refreshDashboard();
 loadConfiguration();
 loadPassports();

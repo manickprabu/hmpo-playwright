@@ -2,6 +2,8 @@
 {% from "govuk/components/skip-link/macro.njk" import govukSkipLink %}
 {% from "hmpo-inset-text/macro.njk" import hmpoInsetText %}
 {% from "hmpo-footer/macro.njk" import hmpoFooter %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "components/protected-message-editor.njk" import protectedMessageEditor %}
 <!doctype html>
 <html lang="en" class="govuk-template">
   <head>
@@ -34,6 +36,22 @@
             <section id="automation-panel" role="tabpanel">
               {% include "partials/automation-controls.njk" %}
               {% include "partials/passport-management.njk" %}
+              <section class="dashboard-panel" aria-labelledby="notification-editor-heading">
+                <h2 class="govuk-heading-m" id="notification-editor-heading">Edit notification message</h2>
+                <p class="govuk-body">Protected values are highlighted in red and cannot be changed.</p>
+                <form method="post" action="/edit-notification">
+                  <input type="hidden" name="editorToken" value="{{ editorToken }}" />
+                  {{ protectedMessageEditor({
+                    id: 'dashboard-message',
+                    name: 'message',
+                    label: 'Notification message',
+                    hint: 'Protected values are read-only. You can select and copy them.',
+                    value: message,
+                    protectedRanges: protectedRanges
+                  }) }}
+                  {{ govukButton({ text: 'Save notification message' }) }}
+                </form>
+              </section>
             </section>
             <section id="activity-panel" role="tabpanel" hidden>{% include "partials/run-summary.njk" %}</section>
           </div>

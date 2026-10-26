@@ -9,6 +9,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ActivityStatus } from '../services/activityTracker.js';
 import { readPassportNumbers } from '../services/passportReader.js';
+import { randomUUID } from 'node:crypto';
+import { normaliseMessageNewlines, validateEditedMessage, type ProtectedRange } from './protectedMessageValidation.js';
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(directory, '../..');
@@ -25,6 +27,28 @@ const viewsDirectory = path.join(directory, 'views');
 const outputDirectory = path.resolve(process.env.OUTPUT_DIR?.trim() || 'output');
 const port = Number(process.env.UI_PORT || 4173);
 let automationProcess: ChildProcess | undefined;
+
+const exampleMessage = normaliseMessageNewlines(`event: NOTIFICATION_SENT
+timestamp: 2025-09-30T12:42:39.170+01:00
+reason: Passport Dispatched (Docs)
+contactDetailsType: Email address
+contact: sdfadf@sdf.com
+messageType: email
+subject: Your new passport has been printed
+message: Dear Diplomat John Syminor,
+Application reference: PEX 827 374 3449
+Your new passport has been printed.
+# What happens next
+Your new passport will be transferred to our delivery supplier in the next few days.
+Your documents will arrive separately and could take up to 2 weeks to arrive.
+# Tell us what you think
+We'd like feedback on our service so we can make improvements.`);
+const protectedValues = ['2025-09-30T12:42:39.170+01:00', 'sdfadf@sdf.com', 'Diplomat John Syminor,', '827 374 3449'];
+const exampleProtectedRanges: ProtectedRange[] = protectedValues.map((value) => {
+  const start = exampleMessage.indexOf(value);
+  return { start, end: start + value.length };
+});
+const notificationEditors = new Map<string, { message: string; protectedRanges: ProtectedRange[] }>();
 
 const initialStatus: ActivityStatus = {
   updatedAt: new Date().toISOString(),
@@ -122,6 +146,40 @@ async function requestJson(request: import('node:http').IncomingMessage): Promis
   } catch {
     throw new Error('Request body must be valid JSON.');
   }
+}
+
+async function requestForm(request: import('node:http').IncomingMessage): Promise<Record<string, string>> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of request) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buffer.length;
+    if (size > 100_000) throw new Error('Request is too large.');
+    chunks.push(buffer);
+  }
+  const values: Record<string, string> = {};
+  for (const [key, value] of new URLSearchParams(Buffer.concat(chunks).toString('utf8'))) {
+    if (!(key in values)) values[key] = value;
+  }
+  return values;
+}
+
+function createNotificationEditor(): { editorToken: string; message: string; protectedRanges: ProtectedRange[] } {
+  const editorToken = randomUUID();
+  const state = {
+    message: exampleMessage,
+    protectedRanges: exampleProtectedRanges.map((range) => ({ ...range })),
+  };
+  notificationEditors.set(editorToken, state);
+  return { editorToken, ...state };
+}
+
+function renderNotificationEditor(
+  response: import('node:http').ServerResponse,
+  data: { editorToken: string; message: string; protectedRanges: ProtectedRange[]; errorMessage?: string; submittedMessage?: string },
+): void {
+  response.writeHead(data.errorMessage ? 400 : 200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+  response.end(templateEnvironment.render('edit-notification.njk', data));
 }
 
 async function resetOutputDirectory(): Promise<void> {
@@ -329,9 +387,43 @@ const server = createServer(async (request, response) => {
     return;
   }
 
+  if (request.method === 'GET' && requestedPath === '/edit-notification') {
+    renderNotificationEditor(response, createNotificationEditor());
+    return;
+  }
+
+  if (request.method === 'POST' && requestedPath === '/edit-notification') {
+    try {
+      const form = await requestForm(request);
+      const trustedState = notificationEditors.get(form.editorToken);
+      if (!trustedState) throw new Error('This editing session has expired. Reload the page and try again.');
+      const validation = validateEditedMessage(trustedState.message, trustedState.protectedRanges, form.message ?? '');
+      if (!validation.valid) {
+        renderNotificationEditor(response, {
+          editorToken: form.editorToken,
+          // Do not render an unvalidated value with trusted original offsets.
+          // A fresh copy keeps the protected overlay and textarea in agreement.
+          message: trustedState.message,
+          protectedRanges: trustedState.protectedRanges,
+          errorMessage: validation.error,
+        });
+        return;
+      }
+      notificationEditors.delete(form.editorToken);
+      renderNotificationEditor(response, { ...createNotificationEditor(), submittedMessage: validation.message });
+    } catch (error) {
+      const state = createNotificationEditor();
+      renderNotificationEditor(response, {
+        ...state,
+        errorMessage: error instanceof Error ? error.message : 'Could not save the notification message.',
+      });
+    }
+    return;
+  }
+
   if (requestedPath === '/') {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    response.end(templateEnvironment.render('index.njk'));
+    response.end(templateEnvironment.render('index.njk', createNotificationEditor()));
     return;
   }
 

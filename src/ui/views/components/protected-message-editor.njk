@@ -1,0 +1,11 @@
+{% macro protectedMessageEditor(params) %}
+  <div class="govuk-form-group{% if params.errorMessage %} govuk-form-group--error{% endif %}">
+    <label class="govuk-label govuk-label--m" for="{{ params.id }}">{{ params.label }}</label>
+    {% if params.hint %}<div id="{{ params.id }}-hint" class="govuk-hint">{{ params.hint }}</div>{% endif %}
+    {% if params.errorMessage %}<p id="{{ params.id }}-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ params.errorMessage }}</p>{% endif %}
+    <div class="protected-message-editor" data-protected-message-editor data-protected-ranges="{{ params.protectedRanges | dump }}">
+      <div class="protected-message-editor__overlay" data-message-overlay aria-hidden="true"></div>
+      <textarea class="govuk-textarea protected-message-editor__textarea{% if params.errorMessage %} govuk-textarea--error{% endif %}" id="{{ params.id }}" name="{{ params.name }}" rows="{{ params.rows or 16 }}"{% if params.hint or params.errorMessage %} aria-describedby="{% if params.hint %}{{ params.id }}-hint{% endif %}{% if params.hint and params.errorMessage %} {% endif %}{% if params.errorMessage %}{{ params.id }}-error{% endif %}"{% endif %}{% if params.disabled %} disabled{% endif %}>{{ params.value }}</textarea>
+    </div>
+  </div>
+{% endmacro %}
