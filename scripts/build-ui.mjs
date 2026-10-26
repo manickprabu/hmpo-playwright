@@ -5,7 +5,9 @@ import * as sass from 'sass';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourcePublicDirectory = path.join(projectRoot, 'src', 'ui', 'public');
+const sourceViewsDirectory = path.join(projectRoot, 'src', 'ui', 'views');
 const outputPublicDirectory = path.join(projectRoot, 'dist', 'ui', 'public');
+const outputViewsDirectory = path.join(projectRoot, 'dist', 'ui', 'views');
 const govukAssetsDirectory = path.join(
   projectRoot,
   'node_modules',
@@ -17,6 +19,7 @@ const govukAssetsDirectory = path.join(
 
 await mkdir(outputPublicDirectory, { recursive: true });
 await cp(sourcePublicDirectory, outputPublicDirectory, { recursive: true, force: true });
+await cp(sourceViewsDirectory, outputViewsDirectory, { recursive: true, force: true });
 await cp(govukAssetsDirectory, path.join(outputPublicDirectory, 'assets'), {
   recursive: true,
   force: true,
