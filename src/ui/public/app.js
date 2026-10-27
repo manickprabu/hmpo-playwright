@@ -5,6 +5,7 @@ import { initialisePassportManagement, loadPassports } from './passport-manageme
 import { initialiseNavigation } from './navigation.js';
 import { initialiseReportDownload } from './report-download.js';
 import { initialiseProtectedMessageEditors } from './protected-message-editor.js';
+import { initialiseInlineProtectedMessageEditors } from './inline-protected-message-editor.js';
 
 async function refreshDashboard() {
   try {
@@ -19,6 +20,12 @@ initialisePassportManagement();
 initialiseNavigation();
 initialiseReportDownload();
 initialiseProtectedMessageEditors();
+initialiseInlineProtectedMessageEditors();
+document.querySelectorAll('[data-message-editor-form]').forEach((form) => {
+  form.addEventListener('submit', () => {
+    console.log(`[${form.dataset.editorKind} message editor] submitted message:`, form.elements.message.value);
+  });
+});
 refreshDashboard();
 loadConfiguration();
 loadPassports();

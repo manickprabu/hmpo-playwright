@@ -182,6 +182,14 @@ function renderNotificationEditor(
   response.end(templateEnvironment.render('edit-notification.njk', data));
 }
 
+function renderInlineNotificationDemo(
+  response: import('node:http').ServerResponse,
+  data: { editorToken: string; message: string; protectedRanges: ProtectedRange[]; errorMessage?: string; submittedMessage?: string },
+): void {
+  response.writeHead(data.errorMessage ? 400 : 200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+  response.end(templateEnvironment.render('edit-notification-demo.njk', data));
+}
+
 async function resetOutputDirectory(): Promise<void> {
   const relativePath = path.relative(projectRoot, outputDirectory);
   const isInsideProject =
@@ -389,6 +397,29 @@ const server = createServer(async (request, response) => {
 
   if (request.method === 'GET' && requestedPath === '/edit-notification') {
     renderNotificationEditor(response, createNotificationEditor());
+    return;
+  }
+
+  if (request.method === 'GET' && requestedPath === '/edit-notification-demo') {
+    renderInlineNotificationDemo(response, createNotificationEditor());
+    return;
+  }
+
+  if (request.method === 'POST' && requestedPath === '/edit-notification-demo') {
+    try {
+      const form = await requestForm(request);
+      const trustedState = notificationEditors.get(form.editorToken);
+      if (!trustedState) throw new Error('This editing session has expired. Reload the page and try again.');
+      const validation = validateEditedMessage(trustedState.message, trustedState.protectedRanges, form.message ?? '');
+      if (!validation.valid) {
+        renderInlineNotificationDemo(response, { editorToken: form.editorToken, message: trustedState.message, protectedRanges: trustedState.protectedRanges, errorMessage: validation.error });
+        return;
+      }
+      notificationEditors.delete(form.editorToken);
+      renderInlineNotificationDemo(response, { ...createNotificationEditor(), submittedMessage: validation.message });
+    } catch (error) {
+      renderInlineNotificationDemo(response, { ...createNotificationEditor(), errorMessage: error instanceof Error ? error.message : 'Could not save the notification message.' });
+    }
     return;
   }
 
